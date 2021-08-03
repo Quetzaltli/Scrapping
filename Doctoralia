@@ -1,0 +1,403 @@
+library(tidytext)
+library(tidyverse)
+library(rvest)
+library(quanteda)
+library(knitr)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(purrr)
+library(tibble)
+library(tidyquant)
+library(janeaustenr)
+library(readr)
+library(knitr)
+library(wordcloud)
+library(tm)
+library(widyr)
+library(sf)
+library(tmap)
+library(leaflet)
+library(mapview)
+library(foreign)
+library(RCurl)
+library(lubridate)
+library(rvest) #Scrap
+library(tidytext) #Text mining
+library(httr) #Peticiones
+
+
+```
+
+
+```{r cars}
+
+total_links <-NULL
+link <-  NULL
+
+for (i in 1:162) {
+  
+  cat(i, "...")
+  
+  url <- paste0("https://www.doctoralia.com.mx/buscar?filters%5Bspecializations%5D%5B0%5D=61&q=Nutri%C3%B3logo+cl%C3%ADnico&loc=&page=",i,"/")
+  
+  pr <- read_html(url)
+  
+  link <- pr %>% 
+    html_nodes('.padding-left-2')%>%
+    html_text()%>%
+     #       html_attr('href') %>% 
+    as_tibble()
+  
+ total_links <- rbind(total_links, link)
+  
+}
+
+write.csv(total_links, "links_transcripciones.csv")
+
+
+
+
+
+```
+
+
+
+```{r pressure, echo=FALSE}
+##BASE NUTRIÓLOGOS
+
+base<- cbind(1,1,1,1,1,1)%>%
+  as_tibble()
+
+names(base)= c("nombres", "especialidades", "calles", "ciudades", "estados", "links")
+
+
+basefinal<- cbind(1,1,1,1,1,1)%>%
+  as_tibble()
+
+names(basefinal)= c("nombres", "especialidades", "calles", "ciudades", "estados", "links")
+
+for(x in 7:49) 
+  
+  { 
+  tryCatch(
+    expr = {
+
+  cat(x, "...")
+  
+  url <- paste0("https://www.doctoralia.com.mx/buscar?filters%5Bspecializations%5D%5B0%5D=61&q=Nutri%C3%B3logo+cl%C3%ADnico&loc=&page=",x,"/") 
+  
+  pg <- read_html(url)
+  
+nombres <- pg%>%
+  html_nodes('h3.offset-bottom-0.h4>a')%>%
+  html_text()%>%
+  as_tibble()
+ 
+names(nombres)=c("nombres")
+
+ if(length(nombres) == 0){
+    nombres <- rbind("NA")%>%
+    as_tibble()}
+
+names(nombres)=c("nombres")
+
+especialidades <- pg%>%
+  html_nodes('h4.h5.text-base-weight.offset-bottom-0.text-muted')%>%
+  html_text()%>%
+  as_tibble()
+
+  if(length(especialidades) == 0){
+    especialidades <- rbind("NA")%>%
+    as_tibble()}
+
+names(especialidades)=c("especialidades")
+
+calles<- pg%>%
+  html_nodes("meta:nth-child(3)")%>%
+  html_attr('content')%>%
+  as_tibble()
+
+if(length(calles) == 0){
+    calles <- rbind("NA")%>%
+    as_tibble()}
+
+names(calles)=c("calles")
+
+ciudades<- pg%>%
+  html_nodes("meta:nth-child(4)")%>%
+  html_attr('content')%>%
+  as_tibble()
+
+if(length(ciudad) == 0){
+    ciudad <- rbind("NA")%>%
+    as_tibble()}
+
+names(ciudades)=c("ciudades")
+
+estados<- pg%>%
+  html_nodes("meta:nth-child(5)")%>%
+  html_attr('content')%>%
+  as_tibble()
+
+ if(length(estado) == 0){
+    estado <- rbind("NA")%>%
+    as_tibble()}
+
+names(estados)=c("estados")
+
+links<- url%>%
+  as_tibble()
+
+names(links)=c("links")
+
+base<- cbind(nombres, especialidades, calles, ciudades, estados, links)%>%
+  as_tibble()
+
+names(base)=c("nombres", "especialidades", "calles", "ciudades", "estados", "links")
+
+basefinal<- rbind.match.columns(base, basefinal)%>%
+  as_tibble()
+
+},
+
+    error = function(e){ 
+        
+base<- cbind("NA", "NA", "NA", "NA", "NA")%>%
+  as_tibble()
+
+names(base)=c("nombres", "especialidades", "calles", "ciudades", "estados")
+
+
+basefinal<- rbind.match.columns(base, basefinal)%>%
+  as_tibble()
+
+}
+
+) }
+
+
+```
+
+
+```{r}
+#BASE INTERNISTAS, nutriologos, nefrologos, 
+
+#based<- cbind(1,1,1)%>%
+ # as_tibble()
+
+#names(based)= c("nombres", "especialidades", "links")
+
+
+#basedoctores<- cbind(1,1,1)%>%
+ # as_tibble()
+
+#names(basedoctores)= c("nombres", "especialidades", "links")
+
+
+for(x in 1:41) 
+  
+  { 
+  tryCatch(
+    expr = {
+
+  cat(x, "...")
+
+      
+  url <- paste0("https://www.doctoralia.com.mx/buscar?filters%5Bspecializations%5D%5B0%5D=19&q=Diabet%C3%B3logo&loc=&page=",x,"")
+  
+  pg <- read_html(url)
+  
+nombres <- pg%>%
+  html_nodes('h3.offset-bottom-0.h4>a')%>%
+  html_text()%>%
+  as_tibble()
+ 
+names(nombres)=c("nombres")
+
+ if(length(nombres) == 0){
+    nombres <- rbind("NA")%>%
+    as_tibble()}
+
+names(nombres)=c("nombres")
+
+especialidades <- pg%>%
+  html_nodes('h4.h5.text-base-weight.offset-bottom-0.text-muted')%>%
+  html_text()%>%
+  as_tibble()
+
+  if(length(especialidades) == 0){
+    especialidades <- rbind("NA")%>%
+    as_tibble()}
+
+names(especialidades)=c("especialidades")
+
+#calles<- pg%>%
+ # html_nodes("meta:nth-child(3)")%>%
+  #html_attr('content')%>%
+  #as_tibble()
+
+#if(length(calles) == 0){
+ #   calles <- rbind("NA")%>%
+  #  as_tibble()}
+
+#names(calles)=c("calles")
+
+#ciudades<- pg%>%
+ # html_nodes("meta:nth-child(4)")%>%
+  #html_attr('content')%>%
+  #as_tibble()
+
+#if(length(ciudad) == 0){
+ #   ciudad <- rbind("NA")%>%
+  #  as_tibble()}
+
+#names(ciudades)=c("ciudades")
+
+#estados<- pg%>%
+ # html_nodes("meta:nth-child(5)")%>%
+  #html_attr('content')%>%
+  #as_tibble()
+
+ #if(length(estado) == 0){
+  #  estado <- rbind("NA")%>%
+   # as_tibble()}
+
+#names(estados)=c("estados")
+
+links <- pg%>%
+  html_nodes('h3.offset-bottom-0.h4>a')%>%
+  html_attr('href')%>%
+  as_tibble()
+
+names(links)=c("links")
+
+based<- cbind(nombres, especialidades, links)%>%
+  as_tibble()
+
+names(based)=c("nombres", "especialidades","links")
+
+basedoctores<- rbind.match.columns(based, basedoctores)%>%
+  as_tibble()
+
+},
+
+    error = function(e){ 
+      
+      
+based<- cbind(nombres, especialidades, links)%>%
+  as_tibble()
+        
+names(based)=c("nombres", "especialidades","links")
+
+basedoctores<- rbind.match.columns(based, basedoctores)%>%
+  as_tibble()
+}
+
+  ) }
+
+
+```
+
+
+
+```{r}
+
+basef<- basef%>%
+  unique()%>%
+  mutate(nombre = str_trim(nombre, side="both"))%>%
+  mutate(nombre = str_squish(nombre)) %>%
+  mutate(estado=str_trim(estado, side="both"))%>%
+  mutate(estado = str_squish(estado)) %>%
+  mutate(especialidad=str_trim(especialidad, side="both"))%>%
+  mutate(especialidad = str_squish(especialidad)) %>%
+  mutate(ciudad =str_trim(ciudad, side="both"))%>%
+  mutate(ciudad = str_squish(ciudad)) %>%
+  mutate(telefono =str_trim(telefono, side="both"))%>%
+  mutate(telefono = str_squish(telefono)) %>%
+  mutate(calle =str_trim(calle, side="both"))%>%
+  mutate(calle = str_squish(calle))
+  
+
+
+write.csv(basef, "basefinal.csv")
+```
+
+
+
+```{r}
+
+
+#pg <- read_html("https://www.doctoralia.com.mx/andres-mayorga-rodriguez/internista/guadalajara")
+
+
+
+direccion <- pg%>%
+  html_nodes('div.visible-xs')%>%
+  html_attr("data-locations-extended")
+
+
+direccion
+
+
+```
+
+```{r}
+ciudades<- pg%>%
+  html_nodes("div.offset-0.text-ellipsis.text-base-color")
+ciudades
+```
+
+```{r}
+ciudades<-pg%>%
+  html_nodes("div.display-flex.align-items-center.text-link.address-name > div.address-name > div > a > span.street")%>%
+  html_node("a.text-link")
+
+ciudades
+```
+
+
+```{r}
+ciudades<-pg%>%
+  html_nodes("div.display-flex.align-items-center.text-link.address-name>div.address-name>div.offset-0.text-ellipsis.text-base-color")
+
+ciudades
+
+
+```
+
+
+
+
+```{r}
+calles<- pg%>%
+  html_nodes("meta:nth-child(3)")%>%
+  html_attr('content')
+
+
+ciudad<- pg%>%
+  html_nodes("meta:nth-child(4)")%>%
+  html_attr('content')
+
+estado<- pg%>%
+  html_nodes("meta:nth-child(5)")%>%
+  html_attr('content')
+
+
+
+base<- cbind(calles, ciudad, estado)
+
+```
+
+
+```{r}
+#pg <- read_html("https://www.doctoralia.com.mx/leonardo-toribio-verduzco-rodriguez/oncologo-internista/orizaba")
+
+
+calle<- pg%>%
+  html_nodes("span.street")%>%
+  html_text%>%
+  as_tibble()
+
+
+calle
