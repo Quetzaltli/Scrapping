@@ -1,0 +1,128 @@
+install.packages("tesseract")
+
+```
+```{r}
+writeLines('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', con = "~/.Renviron")
+```
+```{r}
+Sys.which("make")
+```
+
+```{r}
+library(tesseract)
+library(pdftools)
+library(tidytext)
+library(tidyverse)
+library(rvest)
+library(quanteda)
+library(knitr)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(purrr)
+library(tibble)
+library(tidyquant)
+library(janeaustenr)
+library(readr)
+library(knitr)
+#library(wordcloud)
+library(tm)
+library(widyr)
+```
+
+
+```{r}
+files <- list.files(recursive = T, pattern = ".pdf$") 
+  
+  #map(list.files(full.names = TRUE, pattern = "pdf$"), )
+```
+
+```{r}
+files
+```
+
+```{r}
+
+total<- list()
+
+
+for (i in files) {
+  
+  cat(i, "...")
+  
+  url <- paste0("C:/Users/QUETZALLI/Documents/Contratos SFP/Contratos/",i)
+  
+  total[[url]] <- url }
+  
+ 
+```
+```{r}
+
+Base1<- cbind(1,1)%>%
+ as_tibble()
+
+Basefin<- cbind(1,1)%>%
+  as_tibble()
+
+names(Base1)=c("link","texto")
+
+
+for (i in a) {
+  
+  link<- total[i]
+  
+  texto<- pdf_ocr_text(i)
+  
+  Base1<- cbind(link, texto)%>%
+    rbind(Base1)}
+
+Base1<- Base1%>%
+  as_tibble()%>%
+  mutate(texto1=str_extract(texto, "[:alnum:]"))
+
+#texto<- lapply(total[1:3], pdf_ocr_text)
+
+```
+
+```{r}
+Base<- Base%>%
+  as_tibble()%>%
+   mutate(empresa1=ifelse(grepl("en Obras y Servicios", texto), 1,ifelse(grepl("obras y servicios", texto), 1,ifelse(grepl("CONSTRUCCION Y ASESORIA EN OBRAS Y SERVICIOS", texto), 1, 0))))%>%
+  mutate(empresa2=ifelse(grepl("ESCALANTE", texto), 2, 0))
+ 
+
+ambas<- Base%>%
+  mutate(ambas=empresa1+empresa2)%>%
+  filter(ambas>1)
+ 
+```
+
+
+```{r}
+lista<- Base$link
+
+a<-setdiff(total, lista)%>%
+  unlist()
+
+a
+```
+```{r}
+
+Base<- Base%>%
+  
+```
+
+```{r}
+Base1<- Base1%>%
+  as_tibble()%>%
+  mutate(texto1=as.character(str_extract_all(texto,"[:print:]++")))
+ 
+```
+
+```{r}
+textoo<- list(Base1$texto1)%>%
+  unlist()
+
+Base1<- cbind(textoo, )
+
+```
